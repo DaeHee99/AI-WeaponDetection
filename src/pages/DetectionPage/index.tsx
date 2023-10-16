@@ -32,8 +32,8 @@ function DetectionPage() {
         publishable_key: "rf_c77RUyvX4YVQErgMejdnDHPD61d2",
       })
       .load({
-        model: "weapon-detection-tvvhx",
-        version: 5,
+        model: "weapondetection-ipjj1",
+        version: 2,
       });
 
     setModel(model);
