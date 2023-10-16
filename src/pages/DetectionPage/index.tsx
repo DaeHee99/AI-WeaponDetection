@@ -24,7 +24,7 @@ function DetectionPage() {
   const [boundingBoxColors, setBoundingBoxColors] = useState({});
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const [danger, setDanger] = useState(false);
+  const [danger, setDanger] = useState(false);
 
   const getModel = async () => {
     const model = await window.roboflow
@@ -175,6 +175,15 @@ function DetectionPage() {
             setInterval(() => {
               const [sx, sy, scalingRatio] = getCoordinates(video);
               model.detect(video).then((predictions: any) => {
+                for (let i = 0; i < predictions.length; i++) {
+                  if (predictions[i].class === "mobile-phone") {
+                    setDanger(true);
+                    break;
+                  }
+                  if (i === predictions.length - 1) setDanger(false);
+                }
+                if (predictions.length === 0) setDanger(false);
+
                 ctx?.drawImage(video, 0, 0, WIDTH, HEIGHT);
 
                 ctx?.beginPath();
@@ -190,7 +199,11 @@ function DetectionPage() {
 
   return (
     <>
-      <div className="w-full h-screen flex justify-center items-center">
+      <div
+        className={`w-full h-screen flex justify-center items-center ${
+          danger ? "bg-[#C4302B]" : "bg-white"
+        }`}
+      >
         <img
           src={knifeMan}
           alt="logo"
@@ -200,7 +213,7 @@ function DetectionPage() {
           ref={canvasRef}
           width={WIDTH}
           height={HEIGHT}
-          className={`${showCam ? "block" : "hidden"}`}
+          className={`${showCam ? "block" : "hidden"} z-30`}
         >
           <video ref={videoRef}></video>
         </canvas>
