@@ -17,12 +17,16 @@ const colorList = [
   "#CCCCCC",
 ];
 
-function Detection() {
+interface Props {
+  showCam: boolean;
+  setShowCam: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function Detection({ showCam, setShowCam }: Props) {
   const WIDTH = window.innerWidth > 640 ? 640 : window.innerWidth;
   const HEIGHT = WIDTH * 0.75;
   const [audio] = useState(new Audio(beep));
   const [model, setModel] = useState<any>(null);
-  const [showCam, setShowCam] = useState(false);
   const [boundingBoxColors, setBoundingBoxColors] = useState({});
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,9 +44,11 @@ function Detection() {
         version: 2,
       });
 
-    setModel(model);
-    setStep(2);
-    setShowDot(true);
+    setTimeout(() => {
+      setModel(model);
+      setStep(2);
+      setShowDot(true);
+    }, 3000);
   };
 
   useEffect(() => {
@@ -204,27 +210,27 @@ function Detection() {
   }, [model]);
 
   const clickHandler = () => {
-    if (step === 0) {
-      setStep(1);
-      setShowDot(false);
-      getModel();
-      audio.loop = true;
-    }
+    if (step !== 0) return;
+
+    setStep(1);
+    setShowDot(false);
+    getModel();
+    audio.loop = true;
   };
 
   return (
     <>
       <div
-        className={`w-full h-screen flex justify-center items-center ${
-          danger ? "bg-[#C4302B]" : "bg-white"
+        className={`w-full h-screen flex justify-center items-center pt-[73px] ${
+          danger ? "bg-[#C4302B]" : "bg-gray-100"
         }`}
       >
         <div
           className={`${
             showCam ? "hidden" : "block"
-          } border border-blue-300 shadow rounded-md p-4 max-w-lg w-full mx-auto flex flex-col gap-10`}
+          } border border-blue-300 shadow bg-white rounded-md p-4 max-w-lg w-full mx-auto flex flex-col gap-10`}
         >
-          <img src={knifeMan} alt="logo" className="w-2/3 mx-auto" />
+          <img src={knifeMan} alt="logo" className="w-2/3 mx-auto mt-5" />
           <div className="text-center text-2xl">위험 물체 탐지 프로그램</div>
 
           <button
@@ -272,7 +278,9 @@ function Detection() {
           ref={canvasRef}
           width={WIDTH}
           height={HEIGHT}
-          className={`${showCam ? "block" : "hidden"} z-30`}
+          className={`${
+            showCam ? "block" : "hidden"
+          } z-30 ring-4 ring-blue-300`}
         >
           <video ref={videoRef}></video>
         </canvas>
