@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import knifeMan from "../../assets/images/knife_man.png";
 import beep from "../../assets/audios/beep.mp3";
+import Toast from "../Toast";
 
 const colorList = [
   "#C7FC00",
@@ -33,6 +34,9 @@ function Detection({ showCam, setShowCam }: Props) {
   const [danger, setDanger] = useState(false);
   const [step, setStep] = useState(0);
   const [showDot, setShowDot] = useState(true);
+  const [toastList, setToastList] = useState([""]);
+  const [catchItem, setCatchItem] = useState("");
+  const [toastDelay, setToastDelay] = useState(false);
 
   const getModel = async () => {
     const model = await window.roboflow
@@ -189,12 +193,19 @@ function Detection({ showCam, setShowCam }: Props) {
               model.detect(video).then((predictions: any) => {
                 for (let i = 0; i < predictions.length; i++) {
                   if (predictions[i].class === "mobile-phone") {
+                    setCatchItem(predictions[i].class);
                     setDanger(true);
                     break;
                   }
-                  if (i === predictions.length - 1) setDanger(false);
+                  if (i === predictions.length - 1) {
+                    setDanger(false);
+                    setCatchItem("");
+                  }
                 }
-                if (predictions.length === 0) setDanger(false);
+                if (predictions.length === 0) {
+                  setDanger(false);
+                  setCatchItem("");
+                }
 
                 ctx?.drawImage(video, 0, 0, WIDTH, HEIGHT);
 
@@ -208,6 +219,20 @@ function Detection({ showCam, setShowCam }: Props) {
         );
       });
   }, [model]);
+
+  useEffect(() => {
+    if (catchItem === "" || toastDelay) return;
+
+    setToastList([
+      ...toastList,
+      `위험 물체 ${catchItem}이(가) 감지되었습니다.`,
+    ]);
+
+    setToastDelay(true);
+    setTimeout(() => {
+      setToastDelay(false);
+    }, 3000);
+  }, [catchItem]);
 
   const clickHandler = () => {
     if (step !== 0) return;
@@ -284,6 +309,11 @@ function Detection({ showCam, setShowCam }: Props) {
         >
           <video ref={videoRef}></video>
         </canvas>
+        <div className="fixed top-20 right-10 flex flex-col gap-3 w-96 transition-all">
+          {toastList.map(
+            (item, index) => item !== "" && <Toast message={item} key={index} />
+          )}
+        </div>
       </div>
     </>
   );
