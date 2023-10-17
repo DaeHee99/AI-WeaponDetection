@@ -197,8 +197,23 @@ function Detection({ showCam, setShowCam }: Props) {
               const [sx, sy, scalingRatio] = getCoordinates(video);
               model.detect(video).then((predictions: any) => {
                 for (let i = 0; i < predictions.length; i++) {
-                  if (predictions[i].class === "mobile-phone") {
-                    setCatchItem(predictions[i].class);
+                  if (predictions[i].class === "knife") {
+                    setCatchItem("칼");
+                    setDanger(true);
+                    break;
+                  }
+                  if (predictions[i].class === "hammer") {
+                    setCatchItem("망치");
+                    setDanger(true);
+                    break;
+                  }
+                  if (predictions[i].class === "gun") {
+                    setCatchItem("총");
+                    setDanger(true);
+                    break;
+                  }
+                  if (predictions[i].class === "axe") {
+                    setCatchItem("도끼");
                     setDanger(true);
                     break;
                   }
