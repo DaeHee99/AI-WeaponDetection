@@ -309,7 +309,7 @@ function Detection({ showCam, setShowCam }: Props) {
         >
           <video ref={videoRef}></video>
         </canvas>
-        <div className="fixed top-20 right-10 flex flex-col gap-3 w-96 transition-all">
+        <div className="fixed top-28 right-10 flex flex-col gap-3 w-96 transition-all">
           {toastList.map(
             (item, index) => item !== "" && <Toast message={item} key={index} />
           )}
