@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import knifeMan from "../../assets/images/knife_man.png";
+import beep from "../../assets/audios/beep.mp3";
 
 const colorList = [
   "#C7FC00",
@@ -19,6 +20,7 @@ const colorList = [
 function DetectionPage() {
   const WIDTH = window.innerWidth > 640 ? 640 : window.innerWidth;
   const HEIGHT = WIDTH * 0.75;
+  const [audio] = useState(new Audio(beep));
   const [model, setModel] = useState<any>(null);
   const [showCam, setShowCam] = useState(false);
   const [boundingBoxColors, setBoundingBoxColors] = useState({});
@@ -41,7 +43,13 @@ function DetectionPage() {
   };
 
   useEffect(() => {
+    danger ? audio.play() : audio.pause();
+  }, [danger]);
+
+  useEffect(() => {
     getModel();
+
+    audio.loop = true;
   }, []);
 
   function getCoordinates(img: any) {
