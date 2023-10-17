@@ -1,9 +1,9 @@
-import DetectionPage from "./pages/DetectionPage";
+import Detection from "./components/Detection";
 
 function App() {
   return (
     <>
-      <DetectionPage />
+      <Detection />
     </>
   );
 }
