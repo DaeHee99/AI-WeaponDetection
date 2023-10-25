@@ -20,6 +20,18 @@ const colorList = [
   "#CCCCCC",
 ];
 
+interface predictionsType {
+  bbox: {
+    height: number;
+    width: number;
+    x: number;
+    y: number;
+  };
+  class: string;
+  color: string;
+  confidence: number;
+}
+
 interface Props {
   showCam: boolean;
   setShowCam: React.Dispatch<React.SetStateAction<boolean>>;
@@ -66,7 +78,7 @@ function Detection({ showCam, setShowCam }: Props) {
     audio.loop = true;
   };
 
-  const getCoordinates = (img: any) => {
+  const getCoordinates = (img: HTMLVideoElement) => {
     const dWidth = window.innerWidth;
     const dHeight = window.innerHeight;
     const sWidth = 0;
@@ -77,8 +89,8 @@ function Detection({ showCam, setShowCam }: Props) {
     const canvasRatio = dWidth / dHeight;
     const imageRatio = imageWidth / imageHeight;
 
-    let sy: any;
-    let sx: any;
+    let sy: number;
+    let sx: number;
 
     if (canvasRatio >= imageRatio) {
       sx = 0;
@@ -94,11 +106,11 @@ function Detection({ showCam, setShowCam }: Props) {
   };
 
   const drawBoundingBoxes = (
-    predictions: any,
-    ctx: any,
-    scalingRatio: any,
-    sx: any,
-    sy: any
+    predictions: predictionsType[],
+    ctx: CanvasRenderingContext2D,
+    scalingRatio: number,
+    sx: number,
+    sy: number
   ) => {
     for (let i = 0; i < predictions.length; i++) {
       const confidence = predictions[i].confidence;
@@ -151,7 +163,7 @@ function Detection({ showCam, setShowCam }: Props) {
       ctx.fill();
 
       ctx.fillStyle = ctx.strokeStyle;
-      ctx.lineWidth = "4";
+      ctx.lineWidth = 4;
       ctx.strokeRect(x, y, width, height);
 
       const text = ctx.measureText(
@@ -195,7 +207,7 @@ function Detection({ showCam, setShowCam }: Props) {
           () => {
             setInterval(() => {
               const [sx, sy, scalingRatio] = getCoordinates(video);
-              model.detect(video).then((predictions: any) => {
+              model.detect(video).then((predictions: predictionsType[]) => {
                 for (let i = 0; i < predictions.length; i++) {
                   if (predictions[i].class === "knife") {
                     setCatchItem("칼");
@@ -231,7 +243,8 @@ function Detection({ showCam, setShowCam }: Props) {
 
                 ctx?.beginPath();
 
-                drawBoundingBoxes(predictions, ctx, scalingRatio, sx, sy);
+                ctx &&
+                  drawBoundingBoxes(predictions, ctx, scalingRatio, sx, sy);
               });
             }, 1000 / 30);
           },
